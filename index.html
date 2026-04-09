@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta property="og:image" content="https://futurecost.net/og-image.png" />
+  <meta property="og:url" content="https://futurecost.net/" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:image" content="https://futurecost.net/og-image.png" />
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+  <title>FutureCost — Decision Engine</title>
+  <meta
+    name="description"
+    content="FutureCost helps you see what your spending could become if invested instead."
+  />
+  <meta name="theme-color" content="#050507" />
+  <meta property="og:title" content="FutureCost" />
+  <meta
+    property="og:description"
+    content="See what your spending could become if invested instead."
+  />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-bg" aria-hidden="true">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <div class="app-shell">
+    <nav class="tab-nav glass-card" aria-label="Main Navigation">
+      <button class="tab-btn active" data-tab="calculator" type="button">Calculator</button>
+      <button class="tab-btn" data-tab="presets" type="button">Presets</button>
+      <button class="tab-btn" data-tab="compare" type="button">Compare</button>
+      <button class="tab-btn" data-tab="insights" type="button">Insights</button>
+      <button class="tab-btn" data-tab="history" type="button">History</button>
+    </nav>
+
+    <main class="main-layout">
+      <section class="tab-panel active" id="tab-calculator">
+        <div class="calculator-grid">
+          <div class="left-stack">
+            <section class="panel glass-card input-panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Decision Inputs</p>
+                  <h2>Run the cost of this habit</h2>
+                </div>
+                <div class="head-chip">Live Engine</div>
+              </div>
+
+              <div class="input-group">
+                <div class="label-row">
+                  <label for="amountRange">Amount</label>
+                  <div class="inline-manual">
+                    <span>$</span>
+                    <input
+  id="amountInput"
+  class="manual-input"
+  type="text"
+  inputmode="decimal"
+  placeholder="0.00"
+  value="5.00"
+/>
+                  </div>
+                </div>
+
+                <input
+  id="amountRange"
+  class="app-slider"
+  type="range"
+  min="0.01"
+  max="1000"
+  step="1"
+  value="5"
+/>
+
+<div class="range-meta">
+  <span id="amountRangeMinLabel">$0.01</span>
+  <span id="amountRangeMaxLabel">$1,000</span>
+</div>
+
+<p class="field-note">
+  Use the slider for quick adjustments or type any exact amount manually.
+</p>
+
+<button id="toggleLargeModeBtn" class="ghost-btn small-toggle" type="button">
+  Larger purchases (>$1,000)
+</button>
+              </div>
+
+              <div class="input-row two-col">
+                <div class="input-group compact">
+                  <label for="frequencySelect">Frequency</label>
+                  <select id="frequencySelect" class="app-select">
+                    <option value="daily" selected>Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="bi-weekly">Bi-Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="bi-monthly">Bi-Monthly</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="semi-annually">Semi-Annually</option>
+                    <option value="yearly">Yearly</option>
+                    <option value="one-time">One-Time</option>
+                  </select>
+                </div>
+
+                <div class="input-group compact">
+  <label for="investmentCategorySelect">Investment Type</label>
+
+  <select id="investmentCategorySelect" class="app-select">
+    <option value="sp500" selected>S&amp;P 500</option>
+    <option value="savings">High-Yield Savings</option>
+    <option value="stock">Individual Stock</option>
+    <option value="real-estate">Real Estate</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <div id="investmentSubTypeWrap" class="input-group compact" hidden>
+    <label for="investmentSubTypeSelect">Choose Option</label>
+    <select id="investmentSubTypeSelect" class="app-select"></select>
+  </div>
+
+  <p class="field-note" id="investmentTypeHelpText">
+    Broad U.S. market index.
+  </p>
+
+  <div id="scenarioBox" class="scenario-box" hidden>
+  <div class="scenario-header">
+    <span class="scenario-title">Scenario Range</span>
+   <button class="info-dot tiny-info" type="button" data-tooltip="Historical 20-year annualized returns based on data through current date. Actual future returns will vary.">i</button>
+  </div>
+  <div class="scenario-grid">
+    <div class="scenario-item pessimistic">
+      <span class="scenario-label">Pessimistic</span>
+      <span class="scenario-value" id="scenarioLow">—</span>
+      <span class="scenario-note">Lower historical band</span>
+    </div>
+    <div class="scenario-item average">
+      <span class="scenario-label">Average</span>
+      <span class="scenario-value" id="scenarioMid">—</span>
+      <span class="scenario-note">Long-term historical avg</span>
+    </div>
+    <div class="scenario-item optimistic">
+      <span class="scenario-label">Optimistic</span>
+      <span class="scenario-value" id="scenarioHigh">—</span>
+      <span class="scenario-note">Upper historical band</span>
+    </div>
+  </div>
+  <p class="scenario-footnote">Based on historical ranges. Not a guarantee of future returns.</p>
+</div>
+
+  <div id="customRateWrap" class="input-group compact" hidden>
+    <label for="customRateInput">Custom Annual Return (%)</label>
+    <div class="inline-manual">
+      <input
+        id="customRateInput"
+        class="manual-input"
+        type="number"
+        min="0"
+        max="100"
+        step="0.1"
+        value="8"
+        inputmode="decimal"
+      />
+      <span>%</span>
+    </div>
+  </div>
+
+  <div id="customPortfolioWrap" class="input-group compact" hidden>
+    <label>Custom Portfolio Allocation</label>
+
+    <div class="input-row two-col">
+      <div class="inline-manual">
+        <input id="customPortfolioSp500" class="manual-input" type="number" min="0" max="100" step="1" value="60" inputmode="numeric" />
+        <span>% S&amp;P</span>
+      </div>
+      <div class="inline-manual">
+        <input id="customPortfolioSavings" class="manual-input" type="number" min="0" max="100" step="1" value="40" inputmode="numeric" />
+        <span>% HYSA</span>
+      </div>
+    </div>
+
+   <p class="field-note">Allocation always totals 100% automatically.</p>
+  </div>
+</div>
+
+              <div class="input-row two-col years-toggle-row">
+  <div class="input-group compact">
+    <div class="label-row">
+      <label for="yearsRange">Years</label>
+      <div class="inline-manual small-inline-manual">
+        <input
+          id="yearsInput"
+          class="manual-input"
+          type="number"
+          min="1"
+          max="100"
+          step="1"
+          value="20"
+          inputmode="numeric"
+        />
+        <span>yrs</span>
+      </div>
+    </div>
+
+    <input
+      id="yearsRange"
+      class="app-slider"
+      type="range"
+      min="1"
+      max="100"
+      step="1"
+      value="20"
+    />
+
+    <div class="range-meta">
+      <span>1 yr</span>
+      <span>100 yrs</span>
+    </div>
+
+    <p class="field-note">
+      You can drag the slider or type the exact number of years manually.
+    </p>
+  </div>
+
+  <div class="toggle-card">
+    <div class="toggle-copy">
+      <span>Inflation Adjusted</span>
+      <small>Uses a fixed 3% inflation rate behind the scenes</small>
+    </div>
+
+    <label class="switch">
+      <input id="inflationToggle" type="checkbox" checked />
+      <span class="switch-track"></span>
+    </label>
+  </div>
+</div>
+
+              <div class="quick-actions">
+                <button class="action-btn primary" id="calculateBtn" type="button">Calculate</button>
+                <button class="action-btn secondary" id="saveDecisionBtn" type="button">Save Decision</button>
+                <button class="action-btn secondary" id="resetBtn" type="button">Reset</button>
+              </div>
+            </section>
+
+            <section class="panel glass-card context-panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Behavior Readout</p>
+                  <h2>What this means</h2>
+                </div>
+              </div>
+
+              <div class="context-grid">
+                <article class="mini-card">
+                  <span class="mini-label">Contribution Pattern</span>
+                  <strong id="timeCostText">Small recurring habit</strong>
+                  <small>How this decision behaves over time</small>
+                </article>
+
+                <article class="mini-card">
+                  <span class="mini-label">Contribution Count</span>
+                  <strong id="contributionCountText">7,300</strong>
+                  <small>Total number of spend or invest events</small>
+                </article>
+
+                <article class="mini-card">
+                  <span class="mini-label">Habit Impact</span>
+                  <strong id="habitImpactText">Low</strong>
+                  <small>How damaging the pattern is</small>
+                </article>
+
+                <article class="mini-card">
+                  <span class="mini-label">Purchasing Power</span>
+                  <strong id="inflationImpactText">Real Value On</strong>
+                  <small>Inflation adjustment status</small>
+                </article>
+              </div>
+            </section>
+          </div>
+
+          <div class="right-stack">
+            <section class="panel glass-card hero-result-panel">
+              <div class="hero-top">
+                <div>
+                  <p class="eyebrow">Future Value</p>
+                  <h2 class="hero-title">What this could become</h2>
+                </div>
+                <div class="live-dot-wrap">
+                  <span class="live-dot"></span>
+                  <span>Live</span>
+                </div>
+              </div>
+
+              <div class="main-loss-wrap">
+                <div class="main-loss" id="futureLossDisplay">$0</div>
+                <p class="loss-subtext" id="futureLossSubtext">
+                  Inflation-adjusted future value if invested instead
+                </p>
+              </div>
+
+              <div class="verdict-strip">
+  <div class="verdict-badge verdict-think" id="verdictBadge">Think About It</div>
+  <div class="verdict-note" id="verdictNote">
+    Moderate future cost for this decision.
+  </div>
+  <span id="inflationWarningLink" class="warning-link" style="display: none;">
+    <button type="button" class="warning-trigger" id="showInflationWarningBtn">Why?</button>
+  </span>
+</div>
+
+              <div class="secondary-metrics">
+<div class="metric-card">
+  <span class="metric-label-with-info">
+    Opportunity Cost
+    <button
+      class="info-dot"
+      type="button"
+      aria-label="What is opportunity cost?"
+      data-tooltip="Opportunity cost = the future value you miss by spending instead of investing."
+    >
+      i
+    </button>
+  </span>
+  <strong id="opportunityCostDisplay">$0</strong>
+</div>
+                <div class="metric-card">
+                  <span>Total Spent</span>
+                  <strong id="totalSpentDisplay">$0</strong>
+                </div>
+                <div class="metric-card">
+  <span>Future Value Multiple</span>
+  <strong id="potentialSavingsDisplay">0.0x</strong>
+</div>
+              </div>
+            </section>
+
+            <section class="panel glass-card regret-panel">
+              <div class="section-head">
+                <div>
+                  <p class="eyebrow">Decision Score</p>
+                  <h2>Decision Gauge</h2>
+                </div>
+              </div>
+
+              <div class="gauge-block">
+                <div class="gauge-shell">
+                  <div class="gauge-ring" id="regretGauge" aria-label="Decision gauge">
+                    <div class="gauge-center">
+                      <span class="gauge-score" id="regretScoreText">0</span>
+                      <small>/ 100</small>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="gauge-side">
+                  <div class="gauge-legend">
+                    <div class="legend-item">
+                      <span class="legend-dot green"></span>
+                      <span>Buy</span>
+                    </div>
+                    <div class="legend-item">
+                      <span class="legend-dot yellow"></span>
+                      <span>Think</span>
+                    </div>
+                    <div class="legend-item">
+                      <span class="legend-dot red"></span>
+                      <span>Don’t</span>
+                    </div>
+                  </div>
+
+                  <div class="gauge-copy" id="regretSummary">
+                    Low future impact. This decision stays relatively contained.
+                  </div>
+                </div>
+              </div>
+            </section>
+            <section class="panel glass-card investment-graph-panel">
+  <div class="section-head">
+    <div>
+      <p class="eyebrow">Investment Graph</p>
+      <h2>Historical context + future projection</h2>
+    </div>
+    <div class="head-chip" id="graphChip">Projection</div>
+  </div>
+
+  <div class="graph-meta-row">
+    <div class="graph-status" id="graphStatus">
+      Loading graph…
+    </div>
+    <div class="graph-note" id="graphNote">
+      Historical market data appears only when a real market proxy exists.
+    </div>
+  </div>
+
+  <div class="investment-chart-shell">
+    <div class="investment-chart-wrap">
+      <canvas
+        id="investmentChart"
+        aria-label="Investment history and projection graph"
+      ></canvas>
+    </div>
+
+    <div class="graph-empty-state" id="graphEmptyState" hidden>
+      Historical market data is unavailable for this selection. Projection only.
+    </div>
+  </div>
+</section>
+          </div> <!-- END right-stack -->
+        </div> <!-- END calculator-grid -->
+      </section> <!-- END tab-calculator -->
+      <section class="tab-panel" id="tab-presets">
+        <section class="panel glass-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Preset Habits</p>
+              <h2>Click a habit to instantly fill the calculator</h2>
+            </div>
+          </div>
+
+          <div class="preset-grid" id="presetGrid">
+            <button class="preset-card" type="button" data-name="Daily Coffee" data-amount="5" data-frequency="daily" data-investment="sp500" data-years="20">
+              <span class="preset-emoji">☕</span>
+              <span class="preset-name">Daily Coffee</span>
+              <small>$5 / day</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="New Phone" data-amount="1200" data-frequency="one-time" data-investment="sp500" data-years="10">
+              <span class="preset-emoji">📱</span>
+              <span class="preset-name">New Phone</span>
+              <small>$1,200 once</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Shoes" data-amount="180" data-frequency="monthly" data-investment="sp500" data-years="12">
+              <span class="preset-emoji">👟</span>
+              <span class="preset-name">Shoes</span>
+              <small>$180 / month</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Eating Out" data-amount="25" data-frequency="weekly" data-investment="sp500" data-years="20">
+              <span class="preset-emoji">🍔</span>
+              <span class="preset-name">Eating Out</span>
+              <small>$25 / week</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Energy Drinks" data-amount="4" data-frequency="daily" data-investment="stock-nvidia" data-years="15">
+              <span class="preset-emoji">⚡</span>
+              <span class="preset-name">Energy Drinks</span>
+              <small>$4 / day</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Streaming Stack" data-amount="45" data-frequency="monthly" data-investment="savings" data-years="12">
+              <span class="preset-emoji">🎬</span>
+              <span class="preset-name">Streaming Stack</span>
+              <small>$45 / month</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Weekend Shopping" data-amount="90" data-frequency="weekly" data-investment="sp500" data-years="15">
+              <span class="preset-emoji">🛍️</span>
+              <span class="preset-name">Weekend Shopping</span>
+              <small>$90 / week</small>
+            </button>
+
+            <button class="preset-card" type="button" data-name="Quarterly Upgrade Cycle" data-amount="350" data-frequency="quarterly" data-investment="real-estate-reit" data-years="18">
+              <span class="preset-emoji">💻</span>
+              <span class="preset-name">Quarterly Upgrade Cycle</span>
+              <small>$350 / quarter</small>
+            </button>
+          </div>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="tab-compare">
+        <section class="panel glass-card compare-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Spend vs Invest</p>
+              <h2>Split-screen future comparison</h2>
+            </div>
+          </div>
+
+          <div class="compare-layout">
+            <div class="compare-side spend-side">
+              <span class="compare-label">Spend</span>
+              <div class="compare-big" id="compareSpendValue">$0</div>
+              <p class="compare-copy">Money leaves immediately and never compounds.</p>
+            </div>
+
+            <div class="compare-divider"></div>
+
+            <div class="compare-side invest-side">
+              <span class="compare-label">Invest</span>
+              <div class="compare-big" id="compareInvestValue">$0</div>
+              <p class="compare-copy">Potential future value based on your selected investment type.</p>
+            </div>
+          </div>
+
+          <div class="compare-footer">
+            <div class="difference-wrap">
+              <span>Difference</span>
+              <strong id="compareDifferenceValue">$0</strong>
+            </div>
+
+            <div class="bar-compare">
+              <div class="bar-compare-track">
+                <div class="bar-spend" id="barSpend"></div>
+                <div class="bar-invest" id="barInvest"></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="tab-insights">
+        <section class="panel glass-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Insights</p>
+              <h2>Behavior patterns and biggest damage zones</h2>
+            </div>
+          </div>
+
+          <div class="insight-grid">
+            <article class="insight-card">
+              <span class="insight-tag">Biggest Loss Habit</span>
+              <h3 id="insightBiggestLoss">Run a calculation first</h3>
+              <p id="insightBiggestLossText">
+                The engine will identify how this habit compounds over time.
+              </p>
+            </article>
+
+            <article class="insight-card">
+              <span class="insight-tag">Potential Future Value</span>
+              <h3 id="insightSavings">$0</h3>
+              <p id="insightSavingsText">
+                Redirecting this decision into investing creates future upside.
+              </p>
+            </article>
+
+            <article class="insight-card">
+              <span class="insight-tag">Behavior Pattern</span>
+              <h3 id="insightBehavior">Neutral</h3>
+              <p id="insightBehaviorText">
+                Your current calculation does not show a severe pattern yet.
+              </p>
+            </article>
+
+            <article class="insight-card">
+              <span class="insight-tag">Investment Lens</span>
+              <h3 id="insightInvestmentLens">S&amp;P 500 Index Fund</h3>
+              <p id="insightInvestmentLensText">
+                Your current projection uses a broad stock-market style return assumption.
+              </p>
+            </article>
+          </div>
+
+          <div class="habit-impact-list glass-inset">
+            <div class="list-head">
+              <span>Habit Impact Ranking</span>
+              <strong>Saved Decisions</strong>
+            </div>
+            <div id="habitRankingList" class="ranking-list">
+              <div class="ranking-item empty">No saved decisions yet.</div>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="tab-panel" id="tab-history">
+        <section class="panel glass-card">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">History</p>
+              <h2>Saved decisions, scores, and trend cards</h2>
+            </div>
+            <button class="ghost-btn danger" id="clearHistoryBtn" type="button">Clear History</button>
+          </div>
+
+          <div class="history-list" id="historyList">
+            <div class="history-empty">No saved decisions yet. Run one and press “Save Decision.”</div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <section class="bottom-share-wrap">
+      <button class="action-btn secondary bottom-share-btn" id="shareBottomBtn" type="button">
+        Share
+      </button>
+    </section>
+  </div>
+
+  <div class="share-modal" id="shareModal" aria-hidden="true">
+    <div class="share-backdrop" id="shareBackdrop"></div>
+
+    <div class="share-dialog glass-card" role="dialog" aria-modal="true">
+      <button class="close-share" id="closeShareBtn" type="button" aria-label="Close share dialog">×</button>
+
+      <div class="share-card" id="shareCard">
+        <div class="share-brand">FutureCost</div>
+        <div class="share-label">Future Value</div>
+        <div class="share-value" id="shareLossValue">$0</div>
+        <p class="share-copy" id="shareCopy">
+          This spending decision could have become much more if invested instead.
+        </p>
+        <div class="share-footer">
+          <span id="shareHabitName">Custom Decision</span>
+          <span id="shareYearsText">20 years</span>
+        </div>
+      </div>
+
+      <div class="share-actions">
+        <button class="action-btn primary" id="downloadShareBtn" type="button">Download Image</button>
+        <button class="action-btn secondary" id="nativeShareBtn" type="button">Share</button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="shareCanvas" width="1200" height="1200" hidden></canvas>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js"></script>
+
+<noscript>
+  <p style="color:white;text-align:center;">
+    FutureCost requires JavaScript to run.
+  </p>
+</noscript>
+  
+</body>
+</html>

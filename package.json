@@ -1,0 +1,13 @@
+{
+  "name": "futurecost",
+  "version": "1.0.0",
+  "private": true,
+  "description": "FutureCost app",
+  "main": "api/market-history.js",
+  "scripts": {
+    "start": "node api/market-history.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
