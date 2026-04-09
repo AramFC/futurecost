@@ -1,5 +1,5 @@
 const state = {
-  activeTab: "calculator",
+  activeTab: "home",
   currentPreset: "Custom Decision",
   lastCalculation: null,
   history: []
@@ -491,7 +491,7 @@ function updateSliderFill(slider) {
   const value = Number(slider.value || 0);
   const percent = ((value - min) / (max - min)) * 100;
 
-  slider.style.background = `linear-gradient(90deg, rgba(138, 145, 255, 0.95) 0%, rgba(138, 145, 255, 0.95) ${percent}%, rgba(255,255,255,0.10) ${percent}%, rgba(255,255,255,0.10) 100%)`;
+  slider.style.background = `linear-gradient(90deg, rgba(201, 168, 97, 0.95) 0%, rgba(201, 168, 97, 0.95) ${percent}%, rgba(255,248,232,0.08) ${percent}%, rgba(255,248,232,0.08) 100%)`;
 }
 
 function setAmountSliderScale(amount) {
@@ -1709,14 +1709,14 @@ function createShareCanvas() {
   ctx.clearRect(0, 0, width, height);
 
   const bgGradient = ctx.createLinearGradient(0, 0, width, height);
-  bgGradient.addColorStop(0, "#06070c");
-  bgGradient.addColorStop(1, "#0a0c11");
+bgGradient.addColorStop(0, "#0c0906");
+bgGradient.addColorStop(1, "#060403");
   ctx.fillStyle = bgGradient;
   ctx.fillRect(0, 0, width, height);
 
-  const orb1 = ctx.createRadialGradient(160, 180, 30, 160, 180, 300);
-  orb1.addColorStop(0, "rgba(124, 132, 255, 0.18)");
-  orb1.addColorStop(1, "rgba(124, 132, 255, 0)");
+const orb1 = ctx.createRadialGradient(160, 180, 30, 160, 180, 300);
+orb1.addColorStop(0, "rgba(201, 168, 97, 0.22)");
+orb1.addColorStop(1, "rgba(201, 168, 97, 0)");
   ctx.fillStyle = orb1;
   ctx.fillRect(0, 0, width, height);
 
@@ -1747,7 +1747,7 @@ function createShareCanvas() {
   roundRect(ctx, 40, 40, width - 80, height - 80, 36);
   ctx.stroke();
 
-  ctx.fillStyle = "#d7dbff";
+ctx.fillStyle = "#e7d1a4";
   ctx.font = "800 28px Inter, sans-serif";
   ctx.fillText("FUTURECOST", 90, 120);
 
@@ -1767,7 +1767,7 @@ do {
 
 ctx.fillText(valueText, 90, 360);
 
-  ctx.fillStyle = "#edf0ff";
+  ctx.fillStyle = "#f5e8cf";
   ctx.font = "600 34px Inter, sans-serif";
   wrapCanvasText(
     ctx,
@@ -1877,6 +1877,42 @@ function setupKeyboardShortcuts() {
   });
 }
 
+function setupRevealAnimations() {
+  const revealItems = document.querySelectorAll(".reveal-up");
+
+  if (!revealItems.length) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("in-view");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.18,
+      rootMargin: "0px 0px -40px 0px"
+    }
+  );
+
+  revealItems.forEach((item) => observer.observe(item));
+}
+
+function setupHomeButtons() {
+  const jumpButtons = document.querySelectorAll("[data-jump-tab]");
+
+  jumpButtons.forEach((button) => {
+    button.addEventListener("click", () => {
+      const nextTab = button.dataset.jumpTab;
+      if (!nextTab) return;
+      activateTab(nextTab);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  });
+}
+
 function initializeUIState() {
   loadHistory();
   renderHistory();
@@ -1905,7 +1941,10 @@ function init() {
   setupButtons();
   setupPresets();
   setupKeyboardShortcuts();
+  setupHomeButtons();
   initializeUIState();
+  setupRevealAnimations();
+  activateTab("home");
 }
 
 const GRAPH_HISTORY_MONTHS = 60;
@@ -2002,7 +2041,7 @@ const todayMarkerPlugin = {
     const ctx = chart.ctx;
 
     ctx.save();
-    ctx.strokeStyle = "#f59e0b";
+    ctx.strokeStyle = "#c9a861";
     ctx.lineWidth = 1;
     ctx.setLineDash([5, 5]);
     ctx.beginPath();
@@ -2011,10 +2050,10 @@ const todayMarkerPlugin = {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = "#f59e0b";
+    ctx.fillStyle = "#e7c980";
     ctx.font = '700 11px Inter, sans-serif';
     ctx.textAlign = "left";
-    ctx.fillText("Today", x + 8, yScale.top + 14);
+    ctx.fillText("Today", x + 8, yScale.top + 16);
     ctx.restore();
   }
 };
@@ -2177,7 +2216,7 @@ function buildHistoricalDataset(calc, historicalSeries) {
   });
 }
 
-function buildProjectionDatasets(calc) {
+function buildProjectionDatasets(calc, startPoint = null) {
   const monthlyRateMid = calc.annualReturn / 12;
   const scenarios = getInvestmentScenarios(calc.investmentType);
   const lowAnnual = scenarios?.low ?? Math.max(calc.annualReturn - 0.03, 0);
@@ -2188,17 +2227,33 @@ function buildProjectionDatasets(calc) {
   const monthlyContribution = getMonthlyContribution(calc);
   const totalMonths = Math.max(1, calc.years * 12);
 
-  const today = new Date();
   const avg = [];
   const low = [];
   const high = [];
 
-  let valueAvg = calc.frequency === "one-time" ? calc.amount : 0;
-  let valueLow = calc.frequency === "one-time" ? calc.amount : 0;
-  let valueHigh = calc.frequency === "one-time" ? calc.amount : 0;
+  let startDate;
+  let valueAvg;
+  let valueLow;
+  let valueHigh;
+
+  if (startPoint) {
+    startDate = new Date(startPoint.x);
+    valueAvg = startPoint.y;
+    valueLow = startPoint.y;
+    valueHigh = startPoint.y;
+  } else {
+    startDate = new Date();
+    valueAvg = calc.frequency === "one-time" ? calc.amount : 0;
+    valueLow = calc.frequency === "one-time" ? calc.amount : 0;
+    valueHigh = calc.frequency === "one-time" ? calc.amount : 0;
+  }
 
   for (let monthIndex = 0; monthIndex <= totalMonths; monthIndex += 1) {
-    const pointDate = new Date(today.getFullYear(), today.getMonth() + monthIndex, 1)
+    const pointDate = new Date(
+      startDate.getFullYear(),
+      startDate.getMonth() + monthIndex,
+      startDate.getDate()
+    )
       .toISOString()
       .slice(0, 10);
 
@@ -2246,7 +2301,7 @@ function renderInvestmentChart({ historicalPoints, projectionPoints, lowPoints, 
   const highData = [...historicalPoints.map(() => null), ...highPoints.map((p) => p.y)];
   const avgData = [...historicalPoints.map(() => null), ...projectionPoints.map((p) => p.y)];
 
-  const todayIndex = historicalPoints.length > 0 ? historicalPoints.length - 1 : 0;
+  const todayIndex = historicalPoints.length > 0 ? historicalPoints.length - 1 : null;
   const futureLastIndex = labels.length - 1;
 
   if (investmentChartInstance) {
@@ -2259,15 +2314,15 @@ function renderInvestmentChart({ historicalPoints, projectionPoints, lowPoints, 
     data: {
       labels,
       datasets: [
-        {
-          label: "Historical market context",
-          data: historicalData,
-          borderColor: "#4fd1ff",
-          backgroundColor: "rgba(79, 209, 255, 0.10)",
-          borderWidth: 2,
-          pointRadius: 0,
-          tension: 0.28
-        },
+{
+  label: "Historical market context",
+  data: historicalData,
+  borderColor: "#c9a861",
+backgroundColor: "rgba(201, 168, 97, 0.14)",
+  borderWidth: 2,
+  pointRadius: 0,
+  tension: 0.28
+},
         {
           label: "Pessimistic",
           data: lowData,
@@ -2275,27 +2330,27 @@ function renderInvestmentChart({ historicalPoints, projectionPoints, lowPoints, 
           pointRadius: 0,
           tension: 0.22
         },
-        {
-          label: "Optimistic band",
-          data: highData,
-          borderColor: "rgba(0,0,0,0)",
-          backgroundColor: "rgba(167, 139, 250, 0.14)",
-          fill: "-1",
-          pointRadius: 0,
-          tension: 0.22
-        },
-        {
-          label: "Projected average",
-          data: avgData,
-          borderColor: "#a78bfa",
-          backgroundColor: "rgba(167, 139, 250, 0.16)",
-          borderWidth: 2.5,
+{
+  label: "Optimistic band",
+  data: highData,
+  borderColor: "rgba(0,0,0,0)",
+  backgroundColor: "rgba(201, 168, 97, 0.16)",
+  fill: "-1",
+  pointRadius: 0,
+  tension: 0.22
+},
+{
+  label: "Projected average",
+  data: avgData,
+borderColor: "#f3e1b0",
+backgroundColor: "rgba(243, 225, 176, 0.10)",
+  borderWidth: 2.5,
           pointRadius(context) {
             const index = context.dataIndex;
             return index === futureLastIndex ? 4 : 0;
           },
-          pointBackgroundColor: "#34d399",
-          pointBorderColor: "#081018",
+pointBackgroundColor: "#f3e1b0",
+pointBorderColor: "#1a140d",
           pointBorderWidth: 2,
           tension: 0.22
         }
@@ -2374,7 +2429,7 @@ async function updateInvestmentGraph(calc, token) {
   }
 
   const meta = resolveGraphMeta(calc.investmentType);
-  const projection = buildProjectionDatasets(calc);
+  let projection = buildProjectionDatasets(calc);
 
   setGraphStatus("Updating graph…", false);
 
@@ -2399,6 +2454,12 @@ async function updateInvestmentGraph(calc, token) {
     if (token !== graphUpdateToken) return;
 
     const historicalPoints = buildHistoricalDataset(calc, historicalSeries);
+
+    const lastHistoricalPoint = historicalPoints.length
+  ? historicalPoints[historicalPoints.length - 1]
+  : null;
+
+projection = buildProjectionDatasets(calc, lastHistoricalPoint);
 
     renderInvestmentChart({
       historicalPoints,

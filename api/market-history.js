@@ -12,43 +12,42 @@ app.get("/api/market-history", async (req, res) => {
     return res.status(400).json({ error: "Missing symbol" });
   }
 
-  const apiKey = process.env.ALPHA_VANTAGE_API_KEY;
+  const apiKey = process.env.TWELVE_DATA_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: "Missing Alpha Vantage API key" });
+    return res.status(500).json({ error: "Missing Twelve Data API key" });
   }
 
-  const url = new URL("https://www.alphavantage.co/query");
-  url.searchParams.set("function", "TIME_SERIES_MONTHLY_ADJUSTED");
+  const url = new URL("https://api.twelvedata.com/time_series");
   url.searchParams.set("symbol", symbol);
-  url.searchParams.set("outputsize", "full");
+  url.searchParams.set("interval", "1month");
+  url.searchParams.set("outputsize", "120");
+  url.searchParams.set("format", "JSON");
   url.searchParams.set("apikey", apiKey);
 
   try {
     const response = await fetch(url.toString());
     const json = await response.json();
 
-    const timeSeries = json["Monthly Adjusted Time Series"];
-
-    if (!timeSeries || typeof timeSeries !== "object") {
+    if (!json || !Array.isArray(json.values)) {
       return res.status(502).json({
         error: "Upstream data unavailable",
-        details: json?.Note || json?.Information || json?.ErrorMessage || null
+        details: json?.message || json?.status || null
       });
     }
 
-    const series = Object.entries(timeSeries)
-      .map(([date, values]) => ({
-        date,
-        close: Number(values["5. adjusted close"])
+    const series = json.values
+      .map((point) => ({
+        date: point.datetime,
+        close: Number(point.close)
       }))
       .filter((point) => Number.isFinite(point.close))
       .sort((a, b) => a.date.localeCompare(b.date));
 
     return res.json({
       symbol,
-      source: "Alpha Vantage",
-      interval: "monthly_adjusted",
+      source: "Twelve Data",
+      interval: "1month",
       series
     });
   } catch (error) {

@@ -40,16 +40,115 @@
   </div>
 
   <div class="app-shell">
-    <nav class="tab-nav glass-card" aria-label="Main Navigation">
-      <button class="tab-btn active" data-tab="calculator" type="button">Calculator</button>
-      <button class="tab-btn" data-tab="presets" type="button">Presets</button>
-      <button class="tab-btn" data-tab="compare" type="button">Compare</button>
-      <button class="tab-btn" data-tab="insights" type="button">Insights</button>
-      <button class="tab-btn" data-tab="history" type="button">History</button>
-    </nav>
+<nav class="tab-nav glass-card luxury-nav" aria-label="Main Navigation">
+  <div class="brand-mark">
+    <span class="brand-kicker">FC</span>
+    <span class="brand-name">FutureCost</span>
+  </div>
+
+  <div class="nav-links">
+    <button class="tab-btn active" data-tab="home" type="button">Home</button>
+    <button class="tab-btn" data-tab="calculator" type="button">Calculator</button>
+    <button class="tab-btn" data-tab="presets" type="button">Presets</button>
+    <button class="tab-btn" data-tab="compare" type="button">Compare</button>
+    <button class="tab-btn" data-tab="insights" type="button">Insights</button>
+    <button class="tab-btn" data-tab="history" type="button">History</button>
+  </div>
+</nav>
 
     <main class="main-layout">
-      <section class="tab-panel active" id="tab-calculator">
+      <section class="tab-panel active" id="tab-home">
+  <section class="home-hero luxury-home-panel">
+    <div class="home-hero-copy reveal-up">
+      <p class="home-kicker">Luxury decision intelligence</p>
+      <h1 class="home-title">
+        See the price of
+        <span class="gold-shine">impulse</span>
+        before you pay it.
+      </h1>
+      <p class="home-subtitle">
+        FutureCost turns everyday spending into a long-term wealth number,
+        with premium visuals, instant projections, and a decision engine that
+        makes small habits feel real.
+      </p>
+
+      <div class="home-cta-row">
+        <button class="action-btn primary home-cta" type="button" data-jump-tab="calculator">
+          Open Calculator
+        </button>
+        <button class="action-btn secondary home-cta" type="button" data-jump-tab="insights">
+          View Insights
+        </button>
+      </div>
+
+      <div class="home-proof-row">
+        <div class="home-proof-chip reveal-up delay-1">Live calculator</div>
+        <div class="home-proof-chip reveal-up delay-2">Luxury UI</div>
+        <div class="home-proof-chip reveal-up delay-3">Historical context</div>
+      </div>
+    </div>
+
+    <div class="home-hero-visual reveal-up delay-2">
+      <div class="hero-stack-card hero-stack-card-top">
+        <span class="stack-label">Opportunity cost</span>
+        <strong>$247,000</strong>
+        <small>From one repeated habit</small>
+      </div>
+
+      <div class="hero-stack-card hero-stack-card-middle">
+        <span class="stack-label">Decision score</span>
+        <strong>82 / 100</strong>
+        <small>High regret pattern</small>
+      </div>
+
+      <div class="hero-stack-card hero-stack-card-bottom">
+        <span class="stack-label">Wealth multiple</span>
+        <strong>6.4x</strong>
+        <small>Future value vs spent</small>
+      </div>
+    </div>
+  </section>
+
+  <section class="home-feature-grid">
+    <article class="home-feature-card reveal-up">
+      <p class="feature-number">01</p>
+      <h3>Luxury-first design</h3>
+      <p>
+        Editorial spacing, premium gold styling, glass surfaces, and motion
+        that feels expensive instead of flashy.
+      </p>
+    </article>
+
+    <article class="home-feature-card reveal-up delay-1">
+      <p class="feature-number">02</p>
+      <h3>Fast decision engine</h3>
+      <p>
+        Enter a habit, adjust the investment path, and instantly see what that
+        money could become instead.
+      </p>
+    </article>
+
+    <article class="home-feature-card reveal-up delay-2">
+      <p class="feature-number">03</p>
+      <h3>Built to feel real</h3>
+      <p>
+        Compare spending vs investing, view projections, and make the long-term
+        tradeoff impossible to ignore.
+      </p>
+    </article>
+  </section>
+
+  <section class="home-banner reveal-up">
+    <div>
+      <p class="home-banner-kicker">FutureCost</p>
+      <h2>Small purchases. Massive long-term meaning.</h2>
+    </div>
+    <button class="action-btn primary" type="button" data-jump-tab="calculator">
+      Start now
+    </button>
+  </section>
+</section>
+      <section class="tab-panel" id="tab-calculator">
         <div class="calculator-grid">
           <div class="left-stack">
             <section class="panel glass-card input-panel">
