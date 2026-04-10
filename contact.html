@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+  <title>Contact — FutureCost</title>
+  <meta name="theme-color" content="#050507" />
+  <link rel="icon" type="image/png" href="favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    .contact-page {
+      position: relative;
+      z-index: 2;
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 40px 20px 80px;
+    }
+
+    .contact-card {
+      border-radius: 28px;
+      padding: 30px 24px;
+      background: rgba(13, 14, 18, 0.9);
+      border: 1px solid rgba(201, 168, 97, 0.14);
+      box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(14px);
+    }
+
+    .contact-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    .contact-top a {
+      color: var(--muted);
+      text-decoration: none;
+    }
+
+    .contact-top a:hover {
+      color: var(--text);
+    }
+
+    .contact-card h1 {
+      margin: 0 0 10px;
+      font-size: 2.2rem;
+      letter-spacing: -0.04em;
+    }
+
+    .contact-card p {
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    .contact-list {
+      display: grid;
+      gap: 14px;
+      margin-top: 24px;
+    }
+
+    .contact-item {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .contact-item strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--text);
+      font-size: 1rem;
+    }
+
+    .contact-item a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .contact-item a:hover {
+      color: var(--accent-hover);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-bg" aria-hidden="true">
+    <div class="bg-orb orb-1"></div>
+    <div class="bg-orb orb-2"></div>
+    <div class="bg-orb orb-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <main class="contact-page">
+    <section class="contact-card">
+      <div class="contact-top">
+        <a href="/">← Back to FutureCost</a>
+        <span>Contact</span>
+      </div>
+
+      <h1>Get in touch</h1>
+      <p>
+        For support, product questions, or business inquiries, use the contact
+        options below.
+      </p>
+
+      <div class="contact-list">
+        <div class="contact-item">
+          <strong>Support</strong>
+          <a href="-">-</a>
+        </div>
+
+        <div class="contact-item">
+          <strong>Business</strong>
+          <a href="mailto:-">-</a>
+        </div>
+
+        <div class="contact-item">
+          <strong>Privacy</strong>
+          <a href="mailto:-">-</a>
+        </div>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

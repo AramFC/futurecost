@@ -1913,6 +1913,16 @@ function setupHomeButtons() {
   });
 }
 
+function setupBrandHomeButton() {
+  const brandHomeBtn = document.querySelector("[data-brand-home]");
+  if (!brandHomeBtn) return;
+
+  brandHomeBtn.addEventListener("click", () => {
+    activateTab("home");
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+}
+
 function initializeUIState() {
   loadHistory();
   renderHistory();
@@ -1936,15 +1946,105 @@ function init() {
     return;
   }
 
-  setupTabs();
-  setupInputs();
-  setupButtons();
-  setupPresets();
-  setupKeyboardShortcuts();
-  setupHomeButtons();
-  initializeUIState();
-  setupRevealAnimations();
-  activateTab("home");
+setupTabs();
+setupInputs();
+setupButtons();
+setupPresets();
+setupKeyboardShortcuts();
+setupHomeButtons();
+setupBrandHomeButton();
+setupScrollFooter();
+setupAuthModal();
+setupSignInButton();
+setupSignupForm();
+initializeUIState();
+setupRevealAnimations();
+activateTab("home");
+}
+
+function setupScrollFooter() {
+  const footer = document.getElementById("siteFooter");
+  if (!footer) return;
+
+  function toggleFooter() {
+    const shouldShow = window.scrollY > 180;
+    footer.classList.toggle("visible", shouldShow);
+  }
+
+  window.addEventListener("scroll", toggleFooter, { passive: true });
+  toggleFooter();
+}
+
+function setupAuthModal() {
+  const modal = document.getElementById("authModal");
+  const openBtn = document.querySelector(".nav-start-btn");
+  const closeBtns = document.querySelectorAll("[data-close-auth]");
+
+  if (!modal || !openBtn) return;
+
+  // OPEN (Get Started)
+  openBtn.addEventListener("click", () => {
+    modal.classList.add("active");
+    document.body.style.overflow = "hidden";
+  });
+
+  // CLOSE (overlay + X)
+  closeBtns.forEach(btn => {
+    btn.addEventListener("click", () => {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    });
+  });
+
+  // ESC key close
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      modal.classList.remove("active");
+      document.body.style.overflow = "";
+    }
+  });
+}
+
+function setupSignInButton() {
+  const signInBtn = document.querySelector(".nav-signin-btn");
+
+  if (!signInBtn) return;
+
+  signInBtn.addEventListener("click", () => {
+    window.location.href = "/signin.html"; // future page
+  });
+}
+
+function setupSignupForm() {
+  const signupForm = document.getElementById("signupForm");
+  if (!signupForm) return;
+
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const name = document.getElementById("signupName")?.value.trim();
+    const email = document.getElementById("signupEmail")?.value.trim();
+    const password = document.getElementById("signupPassword")?.value;
+
+    if (!name || !email || !password) {
+      alert("Please fill out all fields.");
+      return;
+    }
+
+    try {
+      // TEMPORARY PLACEHOLDER:
+      // Replace this later with your real auth provider call.
+      console.log("Sign up attempt:", { name, email });
+
+      alert("Signup UI works. Next step is connecting a real auth backend.");
+      document.getElementById("authModal")?.classList.remove("active");
+      document.body.style.overflow = "";
+      signupForm.reset();
+    } catch (error) {
+      console.error("Signup failed:", error);
+      alert("Something went wrong while signing up.");
+    }
+  });
 }
 
 const GRAPH_HISTORY_MONTHS = 60;
