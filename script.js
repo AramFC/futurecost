@@ -2184,69 +2184,35 @@ function buildHistoricalDataset(calc, historicalSeries) {
   const trimmed = historicalSeries.slice(-GRAPH_HISTORY_MONTHS);
   if (trimmed.length < 12) return [];
 
-  if (calc.frequency === "one-time") {
-    const baseClose = Number(trimmed[0].close || 0);
-    if (!baseClose) return [];
-
-    return trimmed.map((point) => ({
+  return trimmed
+    .map((point) => ({
       x: point.date,
-      y: calc.amount * (Number(point.close) / baseClose)
-    }));
-  }
-
-  const monthlyContribution = getMonthlyContribution(calc);
-  let value = 0;
-
-  return trimmed.map((point, index) => {
-    const close = Number(point.close || 0);
-    const prevClose = index > 0 ? Number(trimmed[index - 1].close || 0) : close;
-
-    if (index === 0) {
-      value = monthlyContribution;
-    } else if (prevClose > 0) {
-      value = value * (close / prevClose) + monthlyContribution;
-    } else {
-      value += monthlyContribution;
-    }
-
-    return {
-      x: point.date,
-      y: value
-    };
-  });
+      y: Number(point.close)
+    }))
+    .filter((point) => Number.isFinite(point.y) && point.y > 0);
 }
 
 function buildProjectionDatasets(calc, startPoint = null) {
-  const monthlyRateMid = calc.annualReturn / 12;
   const scenarios = getInvestmentScenarios(calc.investmentType);
-  const lowAnnual = scenarios?.low ?? Math.max(calc.annualReturn - 0.03, 0);
-  const highAnnual = scenarios?.high ?? calc.annualReturn + 0.03;
 
+  const avgAnnual = calc.annualReturn;
+  const lowAnnual = scenarios?.low ?? Math.max(avgAnnual - 0.03, 0);
+  const highAnnual = scenarios?.high ?? avgAnnual + 0.03;
+
+  const monthlyRateAvg = avgAnnual / 12;
   const monthlyRateLow = lowAnnual / 12;
   const monthlyRateHigh = highAnnual / 12;
-  const monthlyContribution = getMonthlyContribution(calc);
+
   const totalMonths = Math.max(1, calc.years * 12);
 
   const avg = [];
   const low = [];
   const high = [];
 
-  let startDate;
-  let valueAvg;
-  let valueLow;
-  let valueHigh;
-
-  if (startPoint) {
-    startDate = new Date(startPoint.x);
-    valueAvg = startPoint.y;
-    valueLow = startPoint.y;
-    valueHigh = startPoint.y;
-  } else {
-    startDate = new Date();
-    valueAvg = calc.frequency === "one-time" ? calc.amount : 0;
-    valueLow = calc.frequency === "one-time" ? calc.amount : 0;
-    valueHigh = calc.frequency === "one-time" ? calc.amount : 0;
-  }
+  const startDate = startPoint ? new Date(startPoint.x) : new Date();
+  let valueAvg = startPoint ? startPoint.y : 100;
+  let valueLow = startPoint ? startPoint.y : 100;
+  let valueHigh = startPoint ? startPoint.y : 100;
 
   for (let monthIndex = 0; monthIndex <= totalMonths; monthIndex += 1) {
     const pointDate = new Date(
@@ -2258,15 +2224,9 @@ function buildProjectionDatasets(calc, startPoint = null) {
       .slice(0, 10);
 
     if (monthIndex > 0) {
-      valueAvg = valueAvg * (1 + monthlyRateMid);
-      valueLow = valueLow * (1 + monthlyRateLow);
-      valueHigh = valueHigh * (1 + monthlyRateHigh);
-
-      if (calc.frequency !== "one-time") {
-        valueAvg += monthlyContribution;
-        valueLow += monthlyContribution;
-        valueHigh += monthlyContribution;
-      }
+      valueAvg *= (1 + monthlyRateAvg);
+      valueLow *= (1 + monthlyRateLow);
+      valueHigh *= (1 + monthlyRateHigh);
     }
 
     avg.push({ x: pointDate, y: valueAvg });
@@ -2314,47 +2274,48 @@ function renderInvestmentChart({ historicalPoints, projectionPoints, lowPoints, 
     data: {
       labels,
       datasets: [
-{
-  label: "Historical market context",
-  data: historicalData,
-  borderColor: "#c9a861",
-backgroundColor: "rgba(201, 168, 97, 0.14)",
-  borderWidth: 2,
-  pointRadius: 0,
-  tension: 0.28
-},
-        {
-          label: "Pessimistic",
-          data: lowData,
-          borderColor: "rgba(0,0,0,0)",
-          pointRadius: 0,
-          tension: 0.22
-        },
-{
-  label: "Optimistic band",
-  data: highData,
-  borderColor: "rgba(0,0,0,0)",
-  backgroundColor: "rgba(201, 168, 97, 0.16)",
-  fill: "-1",
-  pointRadius: 0,
-  tension: 0.22
-},
-{
-  label: "Projected average",
-  data: avgData,
-borderColor: "#f3e1b0",
-backgroundColor: "rgba(243, 225, 176, 0.10)",
-  borderWidth: 2.5,
-          pointRadius(context) {
-            const index = context.dataIndex;
-            return index === futureLastIndex ? 4 : 0;
-          },
-pointBackgroundColor: "#f3e1b0",
-pointBorderColor: "#1a140d",
-          pointBorderWidth: 2,
-          tension: 0.22
-        }
-      ]
+  {
+    label: "Historical price",
+    data: historicalData,
+    borderColor: "#c9a861",
+    backgroundColor: "rgba(201, 168, 97, 0.12)",
+    borderWidth: 2.5,
+    pointRadius: 0,
+    tension: 0.28
+  },
+  {
+    label: "Projected low",
+    data: lowData,
+    borderColor: "rgba(0,0,0,0)",
+    backgroundColor: "rgba(0,0,0,0)",
+    pointRadius: 0,
+    tension: 0.22
+  },
+  {
+    label: "Projected range",
+    data: highData,
+    borderColor: "rgba(0,0,0,0)",
+    backgroundColor: "rgba(201, 168, 97, 0.14)",
+    fill: "-1",
+    pointRadius: 0,
+    tension: 0.22
+  },
+  {
+    label: "Projected price",
+    data: avgData,
+    borderColor: "#f3e1b0",
+    backgroundColor: "rgba(243, 225, 176, 0.10)",
+    borderWidth: 2.5,
+    pointRadius(context) {
+      const index = context.dataIndex;
+      return index === futureLastIndex ? 4 : 0;
+    },
+    pointBackgroundColor: "#f3e1b0",
+    pointBorderColor: "#1a140d",
+    pointBorderWidth: 2,
+    tension: 0.22
+  }
+]
     },
     options: {
       maintainAspectRatio: false,
@@ -2434,7 +2395,9 @@ async function updateInvestmentGraph(calc, token) {
   setGraphStatus("Updating graph…", false);
 
   if (!meta.historicalSupported || !meta.symbol) {
-    setGraphNote("Projection shown from your selected assumptions only. No direct live market history is available for this option.");
+    setGraphNote(
+  "No direct live market history exists for this option. Projection begins today using your selected assumptions. Calculator results assume you begin investing today."
+);
     renderInvestmentChart({
       historicalPoints: [],
       projectionPoints: projection.avg,
@@ -2446,28 +2409,30 @@ async function updateInvestmentGraph(calc, token) {
     return;
   }
 
-  setGraphNote(`Historical data uses ${meta.label}. Projection uses your current calculator assumptions.`);
+  setGraphNote(
+  `Historical price data uses ${meta.label}. Projection begins at today's market price and extends using your selected long-term return assumptions. Calculator results assume you begin investing today.`
+);
 
   try {
     const historicalSeries = await fetchHistoricalSeries(meta.symbol);
 
     if (token !== graphUpdateToken) return;
 
-    const historicalPoints = buildHistoricalDataset(calc, historicalSeries);
+const historicalPoints = buildHistoricalDataset(calc, historicalSeries);
 
-    const lastHistoricalPoint = historicalPoints.length
+const lastHistoricalPoint = historicalPoints.length
   ? historicalPoints[historicalPoints.length - 1]
   : null;
 
 projection = buildProjectionDatasets(calc, lastHistoricalPoint);
 
-    renderInvestmentChart({
-      historicalPoints,
-      projectionPoints: projection.avg,
-      lowPoints: projection.low,
-      highPoints: projection.high,
-      calc
-    });
+renderInvestmentChart({
+  historicalPoints,
+  projectionPoints: projection.avg,
+  lowPoints: projection.low,
+  highPoints: projection.high,
+  calc
+});
 
     setGraphStatus(`Live market context loaded for ${meta.label}`, false);
   } catch (error) {
@@ -2484,8 +2449,10 @@ projection = buildProjectionDatasets(calc, lastHistoricalPoint);
       calc
     });
 
-    setGraphStatus("Historical data unavailable. Projection still shown.", true);
-    setGraphNote("The API did not return usable market data, so only the projection is being shown.");
+setGraphStatus("Historical data unavailable. Projection still shown.", true);
+setGraphNote(
+  "Live historical market data could not be loaded, so only the forward projection is being shown."
+);
   }
 }
 
