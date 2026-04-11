@@ -41,13 +41,21 @@
 
   <div class="app-shell">
 <nav class="tab-nav glass-card luxury-nav" aria-label="Main Navigation">
-  <button class="brand-mark brand-home-btn" type="button" data-brand-home="true">
-    <span class="brand-kicker">FC</span>
-    <span class="brand-name">FutureCost</span>
-  </button>
+<button class="brand-mark brand-home-btn" type="button" data-brand-home="true" aria-label="Go to home">
+<span class="brand-lockup">
+  <span class="brand-wordmark">
+    <span class="brand-word-future">Future</span>
+    <span class="brand-word-cost">Cost</span>
+  </span>
 
+  <span class="brand-icon-wrap">
+    <img src="favicon.png" alt="" class="brand-icon-img" />
+  </span>
+</span>
+</button>
   <div class="nav-links nav-links-center">
     <button class="tab-btn" data-tab="calculator" type="button">Calculator</button>
+    <button class="tab-btn" data-tab="guidance" type="button">Guidance</button>
     <button class="tab-btn" data-tab="presets" type="button">Presets</button>
     <button class="tab-btn" data-tab="compare" type="button">Compare</button>
     <button class="tab-btn" data-tab="insights" type="button">Insights</button>
@@ -73,7 +81,6 @@
     </div>
 
     <div class="home-v2-inner">
-      <p class="home-v2-kicker reveal-up">FutureCost</p>
 
       <h1 class="home-v2-title reveal-up delay-1">
         Every small purchase
@@ -136,165 +143,202 @@
   value="5"
 />
 
-<div class="range-meta">
+<div class="range-meta amount-range-meta">
   <span id="amountRangeMinLabel">$0.01</span>
+  <span class="range-meta-center-note">Use the slider for quick adjustments or type any exact amount manually.</span>
   <span id="amountRangeMaxLabel">$1,000</span>
 </div>
-
-<p class="field-note">
-  Use the slider for quick adjustments or type any exact amount manually.
-</p>
 
 <button id="toggleLargeModeBtn" class="ghost-btn small-toggle" type="button">
   Larger purchases (>$1,000)
 </button>
               </div>
-
-              <div class="input-row two-col">
-                <div class="input-group compact">
-                  <label for="frequencySelect">Frequency</label>
-                  <select id="frequencySelect" class="app-select">
-                    <option value="daily" selected>Daily</option>
-                    <option value="weekly">Weekly</option>
-                    <option value="bi-weekly">Bi-Weekly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="bi-monthly">Bi-Monthly</option>
-                    <option value="quarterly">Quarterly</option>
-                    <option value="semi-annually">Semi-Annually</option>
-                    <option value="yearly">Yearly</option>
-                    <option value="one-time">One-Time</option>
-                  </select>
-                </div>
-
-                <div class="input-group compact">
-  <label for="investmentCategorySelect">Investment Type</label>
-
-  <select id="investmentCategorySelect" class="app-select">
-    <option value="sp500" selected>S&amp;P 500</option>
-    <option value="savings">High-Yield Savings</option>
-    <option value="stock">Individual Stock</option>
-    <option value="real-estate">Real Estate</option>
-    <option value="custom">Custom</option>
-  </select>
-
-  <div id="investmentSubTypeWrap" class="input-group compact" hidden>
-    <label for="investmentSubTypeSelect">Choose Option</label>
-    <select id="investmentSubTypeSelect" class="app-select"></select>
-  </div>
-
-  <p class="field-note" id="investmentTypeHelpText">
-    Broad U.S. market index.
-  </p>
-
-  <div id="scenarioBox" class="scenario-box" hidden>
-  <div class="scenario-header">
-    <span class="scenario-title">Scenario Range</span>
-   <button class="info-dot tiny-info" type="button" data-tooltip="Historical 20-year annualized returns based on data through current date. Actual future returns will vary.">i</button>
-  </div>
-  <div class="scenario-grid">
-    <div class="scenario-item pessimistic">
-      <span class="scenario-label">Pessimistic</span>
-      <span class="scenario-value" id="scenarioLow">—</span>
-      <span class="scenario-note">Lower historical band</span>
+<div class="calculator-input-split">
+  <div class="calculator-input-col calculator-input-col-left">
+    <div class="input-group compact frequency-group">
+      <label for="frequencySelect">Frequency</label>
+      <div class="frequency-select-wrap">
+        <select id="frequencySelect" class="app-select frequency-select">
+          <option value="daily" selected>Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="bi-weekly">Bi-Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="bi-monthly">Bi-Monthly</option>
+          <option value="quarterly">Quarterly</option>
+          <option value="semi-annually">Semi-Annually</option>
+          <option value="yearly">Yearly</option>
+          <option value="one-time">One-Time</option>
+        </select>
+      </div>
     </div>
-    <div class="scenario-item average">
-      <span class="scenario-label">Average</span>
-      <span class="scenario-value" id="scenarioMid">—</span>
-      <span class="scenario-note">Long-term historical avg</span>
-    </div>
-    <div class="scenario-item optimistic">
-      <span class="scenario-label">Optimistic</span>
-      <span class="scenario-value" id="scenarioHigh">—</span>
-      <span class="scenario-note">Upper historical band</span>
-    </div>
-  </div>
-  <p class="scenario-footnote">Based on historical ranges. Not a guarantee of future returns.</p>
-</div>
 
-  <div id="customRateWrap" class="input-group compact" hidden>
-    <label for="customRateInput">Custom Annual Return (%)</label>
-    <div class="inline-manual">
+    <div class="input-group compact years-group">
+      <div class="label-row">
+        <label for="yearsRange">Years</label>
+        <div class="inline-manual small-inline-manual">
+          <input
+            id="yearsInput"
+            class="manual-input"
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+            value="20"
+            inputmode="numeric"
+          />
+          <span>yrs</span>
+        </div>
+      </div>
+
       <input
-        id="customRateInput"
-        class="manual-input"
-        type="number"
-        min="0"
+        id="yearsRange"
+        class="app-slider"
+        type="range"
+        min="1"
         max="100"
-        step="0.1"
-        value="8"
-        inputmode="decimal"
+        step="1"
+        value="20"
       />
-      <span>%</span>
-    </div>
-  </div>
 
-  <div id="customPortfolioWrap" class="input-group compact" hidden>
-    <label>Custom Portfolio Allocation</label>
-
-    <div class="input-row two-col">
-      <div class="inline-manual">
-        <input id="customPortfolioSp500" class="manual-input" type="number" min="0" max="100" step="1" value="60" inputmode="numeric" />
-        <span>% S&amp;P</span>
+      <div class="range-meta">
+        <span>1 yr</span>
+        <span>100 yrs</span>
       </div>
-      <div class="inline-manual">
-        <input id="customPortfolioSavings" class="manual-input" type="number" min="0" max="100" step="1" value="40" inputmode="numeric" />
-        <span>% HYSA</span>
-      </div>
-    </div>
 
-   <p class="field-note">Allocation always totals 100% automatically.</p>
-  </div>
+      <p class="field-note">
+        You can drag the slider or type the exact number of years manually.
+      </p>
+
+      <div class="inflation-mini-row">
+  <span class="inflation-label">Inflation Adjusted</span>
+
+  <label class="switch switch-sm">
+    <input id="inflationToggle" type="checkbox" checked />
+    <span class="switch-track"></span>
+  </label>
+
+  <button
+    class="info-dot"
+    type="button"
+    aria-label="How inflation works"
+    data-tooltip="Uses a fixed 3% inflation rate behind the scenes. This adjusts future values into today's purchasing power."
+  >
+    i
+  </button>
 </div>
 
-              <div class="input-row two-col years-toggle-row">
-  <div class="input-group compact">
-    <div class="label-row">
-      <label for="yearsRange">Years</label>
-      <div class="inline-manual small-inline-manual">
-        <input
-          id="yearsInput"
-          class="manual-input"
-          type="number"
-          min="1"
-          max="100"
-          step="1"
-          value="20"
-          inputmode="numeric"
-        />
-        <span>yrs</span>
-      </div>
     </div>
-
-    <input
-      id="yearsRange"
-      class="app-slider"
-      type="range"
-      min="1"
-      max="100"
-      step="1"
-      value="20"
-    />
-
-    <div class="range-meta">
-      <span>1 yr</span>
-      <span>100 yrs</span>
-    </div>
-
-    <p class="field-note">
-      You can drag the slider or type the exact number of years manually.
-    </p>
   </div>
 
-  <div class="toggle-card">
-    <div class="toggle-copy">
-      <span>Inflation Adjusted</span>
-      <small>Uses a fixed 3% inflation rate behind the scenes</small>
-    </div>
+  <div class="calculator-input-col calculator-input-col-right">
+    <div class="input-group compact investment-group">
+      <label for="investmentCategorySelect">Investment Type</label>
 
-    <label class="switch">
-      <input id="inflationToggle" type="checkbox" checked />
-      <span class="switch-track"></span>
-    </label>
+      <select id="investmentCategorySelect" class="app-select">
+        <option value="sp500" selected>S&amp;P 500</option>
+        <option value="savings">High-Yield Savings</option>
+        <option value="stock">Individual Stock</option>
+        <option value="real-estate">Real Estate</option>
+        <option value="custom">Custom</option>
+      </select>
+
+      <div id="investmentSubTypeWrap" class="input-group compact" hidden>
+        <label for="investmentSubTypeSelect">Choose Option</label>
+        <select id="investmentSubTypeSelect" class="app-select"></select>
+      </div>
+
+      <p class="field-note" id="investmentTypeHelpText">
+        Broad U.S. market index.
+      </p>
+
+      <div id="scenarioBox" class="scenario-box" hidden>
+        <div class="scenario-header">
+          <span class="scenario-title">Scenario Range</span>
+          <button
+            class="info-dot tiny-info"
+            type="button"
+            data-tooltip="Historical 20-year annualized returns based on data through current date. Actual future returns will vary."
+          >
+            i
+          </button>
+        </div>
+
+        <div class="scenario-grid">
+          <div class="scenario-item pessimistic">
+            <span class="scenario-label">Pessimistic</span>
+            <span class="scenario-value" id="scenarioLow">—</span>
+            <span class="scenario-note">Lower historical band</span>
+          </div>
+          <div class="scenario-item average">
+            <span class="scenario-label">Average</span>
+            <span class="scenario-value" id="scenarioMid">—</span>
+            <span class="scenario-note">Long-term historical avg</span>
+          </div>
+          <div class="scenario-item optimistic">
+            <span class="scenario-label">Optimistic</span>
+            <span class="scenario-value" id="scenarioHigh">—</span>
+            <span class="scenario-note">Upper historical band</span>
+          </div>
+        </div>
+
+        <p class="scenario-footnote">
+          Based on historical ranges. Not a guarantee of future returns.
+        </p>
+      </div>
+
+      <div id="customRateWrap" class="input-group compact" hidden>
+        <label for="customRateInput">Custom Annual Return (%)</label>
+        <div class="inline-manual">
+          <input
+            id="customRateInput"
+            class="manual-input"
+            type="number"
+            min="0"
+            max="100"
+            step="0.1"
+            value="8"
+            inputmode="decimal"
+          />
+          <span>%</span>
+        </div>
+      </div>
+
+      <div id="customPortfolioWrap" class="input-group compact" hidden>
+        <label>Custom Portfolio Allocation</label>
+
+        <div class="input-row two-col">
+          <div class="inline-manual">
+            <input
+              id="customPortfolioSp500"
+              class="manual-input"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value="60"
+              inputmode="numeric"
+            />
+            <span>% S&amp;P</span>
+          </div>
+
+          <div class="inline-manual">
+            <input
+              id="customPortfolioSavings"
+              class="manual-input"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value="40"
+              inputmode="numeric"
+            />
+            <span>% HYSA</span>
+          </div>
+        </div>
+
+        <p class="field-note">Allocation always totals 100% automatically.</p>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -470,7 +514,92 @@
 </section>
           </div> <!-- END right-stack -->
         </div> <!-- END calculator-grid -->
+
+        <section class="panel glass-card guidance-panel calculator-guidance-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Investment Guidance</p>
+              <h2>Which option fits this kind of purchase?</h2>
+            </div>
+            <div class="head-chip">Starter</div>
+          </div>
+
+          <div class="guidance-grid">
+            <article class="guidance-card">
+              <span class="guidance-tag">How to use this</span>
+              <h3>Not sure what to choose?</h3>
+              <p>
+                Use this section to understand what kind of investment may fit your spending pattern
+                before you run the full projection.
+              </p>
+            </article>
+
+            <article class="guidance-card">
+              <span class="guidance-tag">Example</span>
+              <h3>Daily coffee for 20 years</h3>
+              <p>
+                A long-term recurring habit is usually better compared against a broad, stable
+                long-term growth option like the S&amp;P 500 rather than a short-term cash yield.
+              </p>
+            </article>
+
+            <article class="guidance-card">
+              <span class="guidance-tag">Starter lens</span>
+              <h3 id="calculatorGuidanceLiveTitle">Current selection</h3>
+              <p id="calculatorGuidanceLiveText">
+                Choose an amount, frequency, years, and investment type in Calculator to get a clearer fit recommendation here.
+              </p>
+            </article>
+          </div>
+        </section>
       </section> <!-- END tab-calculator -->
+
+      <section class="tab-panel" id="tab-guidance">
+        <div class="wip-overlay" id="guidanceWipOverlay">
+  <div class="wip-center">
+    <h2>Guidance is coming soon</h2>
+    <p>This section is still being built. Check back later.</p>
+  </div>
+</div>
+        <section class="panel glass-card guidance-panel">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">Investment Guidance</p>
+              <h2>Which option fits this kind of purchase?</h2>
+            </div>
+            <div class="head-chip">Starter</div>
+          </div>
+
+          <div class="guidance-grid">
+            <article class="guidance-card">
+              <span class="guidance-tag">How to use this</span>
+              <h3>Not sure what to choose?</h3>
+              <p>
+                Use this tab to understand what kind of investment may fit your spending pattern
+                before you run the full projection.
+              </p>
+            </article>
+
+            <article class="guidance-card">
+              <span class="guidance-tag">Example</span>
+              <h3>Daily coffee for 20 years</h3>
+              <p>
+                A long-term recurring habit is usually better compared against a broad, stable
+                long-term growth option like the S&amp;P 500 rather than a short-term cash yield.
+              </p>
+            </article>
+
+            <article class="guidance-card">
+              <span class="guidance-tag">Starter lens</span>
+<h3 id="guidanceTabLiveTitle">Current selection</h3>
+<p id="guidanceTabLiveText">
+  Choose an amount, frequency, years, and investment type in Calculator to get a clearer fit recommendation here.
+</p>
+            </article>
+          </div>
+        </section>
+      </section>
+
       <section class="tab-panel" id="tab-presets">
         <section class="panel glass-card">
           <div class="section-head">
@@ -645,7 +774,7 @@
       </section>
     </main>
 
-    <section class="bottom-share-wrap">
+    <section class="bottom-share-wrap" id="bottomShareWrap">
       <button class="action-btn secondary bottom-share-btn" id="shareBottomBtn" type="button">
         Share
       </button>
@@ -684,10 +813,10 @@
   <div class="site-footer-inner">
     <span>© 2026 FutureCost</span>
     <div class="site-footer-links">
-      <a href="/terms.html">Terms of Service</a>
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/contact.html">Contact</a>
-      <a href="/disclaimer.html">Disclaimer</a>
+      <a href="./terms.html">Terms of Service</a>
+      <a href="./privacy.html">Privacy Policy</a>
+      <a href="./contact.html">Contact</a>
+      <a href="./disclaimer.html">Disclaimer</a>
     </div>
   </div>
 </footer>
@@ -706,14 +835,16 @@
       <input id="signupEmail" name="email" type="email" placeholder="Email Address" required />
       <input id="signupPassword" name="password" type="password" placeholder="Password" required />
 
-      <button class="action-btn primary auth-submit" type="submit">
+      <button class="action-btn primary auth-submit" id="signupSubmitBtn" type="submit">
         Get Started
       </button>
     </form>
 
+    <div class="auth-status" id="signupStatus"></div>
+
     <p class="auth-switch">
       Already have an account?
-      <a class="auth-link" href="/signin.html">Sign in</a>
+      <a class="auth-link" href="./signin.html">Sign in</a>
     </p>
   </div>
 </div>

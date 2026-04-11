@@ -1,0 +1,10 @@
+[
+  {
+    "id": "1b5b19fc-c24c-4b73-8617-dd43bfbca3aa",
+    "name": "Aram Arshakian",
+    "email": "arama.arshakian@gmail.com",
+    "passwordSalt": "a2ea511b994f2129589c3e8ce58a20d1",
+    "passwordHash": "10c5f7eb10c7ead907c6e3234b3c72559e501a6aec3476319120c4f879480e41bc5a6dc3be71791cc8cad6b746ad9bcde89b288b3d5df3d8cf78b786a88eb1e2",
+    "createdAt": 1775889351540
+  }
+]

@@ -21,6 +21,11 @@ function getCurrentMaxAmount() {
 const elements = {
   tabButtons: document.querySelectorAll(".tab-btn"),
   tabPanels: document.querySelectorAll(".tab-panel"),
+  bottomShareWrap: document.getElementById("bottomShareWrap"),
+  calculatorGuidanceLiveTitle: document.getElementById("calculatorGuidanceLiveTitle"),
+  calculatorGuidanceLiveText: document.getElementById("calculatorGuidanceLiveText"),
+  guidanceTabLiveTitle: document.getElementById("guidanceTabLiveTitle"),
+  guidanceTabLiveText: document.getElementById("guidanceTabLiveText"),
 
   amountRange: document.getElementById("amountRange"),
   amountInput: document.getElementById("amountInput"),
@@ -749,6 +754,14 @@ function activateTab(tab) {
   elements.tabPanels.forEach((panel) => {
     panel.classList.toggle("active", panel.id === `tab-${tab}`);
   });
+
+  if (elements.bottomShareWrap) {
+    elements.bottomShareWrap.hidden = tab === "home";
+  }
+
+  if (tab === "home" && elements.shareModal?.classList.contains("open")) {
+    closeShareModal();
+  }
 }
 
 function updateInvestmentUI() {
@@ -829,26 +842,30 @@ function safeAddEventListener(element, event, handler) {
 
 function setupInputs() {
   [elements.amountRange, elements.yearsRange].forEach((slider) => {
-  updateSliderFill(slider);
+    updateSliderFill(slider);
 
-elements.customPortfolioSp500.addEventListener("input", () => {
-  syncPortfolioInputs("sp500");
-  calculateAndRender();
-});
-
-elements.customPortfolioSavings.addEventListener("input", () => {
-  syncPortfolioInputs("savings");
-  calculateAndRender();
-});
-
-  slider.addEventListener("input", () => {
-    if (slider === elements.amountRange) {
-      syncAmountFromRange();
-    } else {
-      syncYearsFromRange();
-    }
+    slider.addEventListener("input", () => {
+      if (slider === elements.amountRange) {
+        syncAmountFromRange();
+      } else {
+        syncYearsFromRange();
+      }
+    });
   });
-});
+
+  if (elements.customPortfolioSp500) {
+    elements.customPortfolioSp500.addEventListener("input", () => {
+      syncPortfolioInputs("sp500");
+      calculateAndRender();
+    });
+  }
+
+  if (elements.customPortfolioSavings) {
+    elements.customPortfolioSavings.addEventListener("input", () => {
+      syncPortfolioInputs("savings");
+      calculateAndRender();
+    });
+  }
 
 elements.amountInput.addEventListener("input", handleAmountInputTyping);
 elements.amountInput.addEventListener("keydown", function(e) {
@@ -1322,6 +1339,33 @@ if (inputs.inflationOn && opportunityCost < 0 && inputs.investmentType === "savi
   renderCalculation();
 }
 
+function autoFitText(element, max = 32, min = 11) {
+  if (!element) return;
+
+  element.style.fontSize = "";
+  let size = max;
+
+  while (size > min && element.scrollWidth > element.clientWidth) {
+    size -= 1;
+    element.style.fontSize = `${size}px`;
+  }
+}
+
+function fitDynamicValues() {
+  [
+    document.getElementById("scenarioLow"),
+    document.getElementById("scenarioMid"),
+    document.getElementById("scenarioHigh"),
+    elements.futureLossDisplay,
+    elements.opportunityCostDisplay,
+    elements.totalSpentDisplay,
+    elements.potentialSavingsDisplay,
+    elements.compareSpendValue,
+    elements.compareInvestValue,
+    elements.compareDifferenceValue
+  ].forEach((el) => autoFitText(el));
+}
+
 function renderCalculation() {
   if (!state.lastCalculation) return;
 
@@ -1361,8 +1405,10 @@ elements.verdictNote.textContent = calc.inflationExplanation || calc.verdictNote
 
   renderCompare(calc);
   renderInsights(calc);
+  renderGuidance(calc);
   renderShareCard(calc);
   queueGraphUpdate(calc);
+  fitDynamicValues();
 }
 
 function renderCompare(calc) {
@@ -1407,6 +1453,44 @@ function renderInsights(calc) {
   renderHabitRankings();
 }
 
+function renderGuidance(calc) {
+  const targets = [
+    {
+      titleEl: elements.calculatorGuidanceLiveTitle,
+      textEl: elements.calculatorGuidanceLiveText
+    },
+    {
+      titleEl: elements.guidanceTabLiveTitle,
+      textEl: elements.guidanceTabLiveText
+    }
+  ];
+
+  const recurring = calc.frequency !== "one-time";
+  const longTerm = calc.years >= 10;
+
+  let title = "Current selection";
+  let text = `This scenario is currently using ${calc.investmentLabel}.`;
+
+  if (recurring && longTerm && calc.investmentType === "savings") {
+    title = "Probably too conservative";
+    text = `Because this is a recurring long-term habit, a cash-style option like ${calc.investmentLabel} may understate the long-term opportunity cost. A broad growth option is usually more informative here.`;
+  } else if (recurring && longTerm && calc.investmentType === "sp500") {
+    title = "Strong long-term fit";
+    text = `For a repeated purchase over ${calc.years} years, ${calc.investmentLabel} is a strong benchmark because it reflects long-term compounding more clearly than short-term cash yield options.`;
+  } else if (!recurring && calc.years <= 5) {
+    title = "Shorter-horizon decision";
+    text = `Because this is a one-time or shorter-horizon scenario, comparing a stable lower-volatility option can also make sense depending on the user's risk tolerance.`;
+  } else if (String(calc.investmentType).startsWith("stock-")) {
+    title = "Higher-volatility comparison";
+    text = `${calc.investmentLabel} can be useful for showing upside, but it is a more aggressive benchmark. For general guidance, users may still want to compare against a broader market option too.`;
+  }
+
+  targets.forEach(({ titleEl, textEl }) => {
+    if (titleEl) titleEl.textContent = title;
+    if (textEl) textEl.textContent = text;
+  });
+}
+
 function renderShareCard(calc) {
   elements.shareLossValue.textContent = formatCurrency(calc.futureLoss);
   elements.shareHabitName.textContent = calc.presetName || "Custom Decision";
@@ -1433,11 +1517,11 @@ function setupButtons() {
   calculateAndRender();
 });
 
-  elements.shareBottomBtn.addEventListener("click", openShareModal);
-  elements.shareBackdrop.addEventListener("click", closeShareModal);
-  elements.closeShareBtn.addEventListener("click", closeShareModal);
-  elements.downloadShareBtn.addEventListener("click", downloadShareImage);
-  elements.nativeShareBtn.addEventListener("click", nativeShareImage);
+  safeAddEventListener(elements.shareBottomBtn, "click", openShareModal);
+  safeAddEventListener(elements.shareBackdrop, "click", closeShareModal);
+  safeAddEventListener(elements.closeShareBtn, "click", closeShareModal);
+  safeAddEventListener(elements.downloadShareBtn, "click", downloadShareImage);
+  safeAddEventListener(elements.nativeShareBtn, "click", nativeShareImage);
 
   elements.clearHistoryBtn.addEventListener("click", () => {
     state.history = [];
@@ -1694,7 +1778,10 @@ function openShareModal() {
 function closeShareModal() {
   elements.shareModal.classList.remove("open");
   elements.shareModal.setAttribute("aria-hidden", "true");
-  elements.shareBottomBtn.focus();
+
+  if (elements.shareBottomBtn && !elements.bottomShareWrap?.hidden) {
+    elements.shareBottomBtn.focus();
+  }
 }
 
 function createShareCanvas() {
@@ -1967,11 +2054,20 @@ function setupScrollFooter() {
   if (!footer) return;
 
   function toggleFooter() {
-    const shouldShow = window.scrollY > 180;
+    const scrollBottom = window.scrollY + window.innerHeight;
+    const docHeight = Math.max(
+      document.body.scrollHeight,
+      document.documentElement.scrollHeight
+    );
+
+    const threshold = 140;
+    const shouldShow = scrollBottom >= (docHeight - threshold);
+
     footer.classList.toggle("visible", shouldShow);
   }
 
   window.addEventListener("scroll", toggleFooter, { passive: true });
+  window.addEventListener("resize", toggleFooter);
   toggleFooter();
 }
 
@@ -2011,40 +2107,99 @@ function setupSignInButton() {
   if (!signInBtn) return;
 
   signInBtn.addEventListener("click", () => {
-    window.location.href = "/signin.html"; // future page
+    window.location.href = "./signin.html";
   });
 }
 
 function setupSignupForm() {
   const signupForm = document.getElementById("signupForm");
-  if (!signupForm) return;
+  const signupStatus = document.getElementById("signupStatus");
+  const signupSubmitBtn = document.getElementById("signupSubmitBtn");
 
-  signupForm.addEventListener("submit", async (e) => {
-    e.preventDefault();
+  if (signupForm) {
+    signupForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
 
-    const name = document.getElementById("signupName")?.value.trim();
-    const email = document.getElementById("signupEmail")?.value.trim();
-    const password = document.getElementById("signupPassword")?.value;
+      const name = document.getElementById("signupName")?.value.trim();
+      const email = document.getElementById("signupEmail")?.value.trim();
+      const password = document.getElementById("signupPassword")?.value || "";
 
-    if (!name || !email || !password) {
-      alert("Please fill out all fields.");
-      return;
-    }
+      if (signupStatus) {
+        signupStatus.textContent = "";
+        signupStatus.classList.remove("error", "success");
+      }
 
-    try {
-      // TEMPORARY PLACEHOLDER:
-      // Replace this later with your real auth provider call.
-      console.log("Sign up attempt:", { name, email });
+      if (!name || !email || !password) {
+        if (signupStatus) {
+          signupStatus.textContent = "Please fill out all fields.";
+          signupStatus.classList.add("error");
+        }
+        return;
+      }
 
-      alert("Signup UI works. Next step is connecting a real auth backend.");
-      document.getElementById("authModal")?.classList.remove("active");
-      document.body.style.overflow = "";
-      signupForm.reset();
-    } catch (error) {
-      console.error("Signup failed:", error);
-      alert("Something went wrong while signing up.");
-    }
-  });
+      if (password.length < 8) {
+        if (signupStatus) {
+          signupStatus.textContent = "Password must be at least 8 characters.";
+          signupStatus.classList.add("error");
+        }
+        return;
+      }
+
+      if (signupSubmitBtn) {
+        signupSubmitBtn.disabled = true;
+        signupSubmitBtn.textContent = "Creating...";
+      }
+
+      try {
+        const response = await fetch("/api/auth/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            name,
+            email,
+            password
+          })
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.message || "Signup failed.");
+        }
+
+        if (signupStatus) {
+          signupStatus.textContent = "Account created. You are now signed in.";
+          signupStatus.classList.add("success");
+        }
+
+        signupForm.reset();
+
+        setTimeout(() => {
+          const authModal = document.getElementById("authModal");
+          if (authModal) {
+            authModal.classList.remove("active");
+          }
+          document.body.style.overflow = "";
+        }, 700);
+      } catch (error) {
+        console.error("Signup failed:", error);
+
+        if (signupStatus) {
+          signupStatus.textContent = error.message || "Something went wrong while signing up.";
+          signupStatus.classList.add("error");
+        }
+      } finally {
+        if (signupSubmitBtn) {
+          signupSubmitBtn.disabled = false;
+          signupSubmitBtn.textContent = "Get Started";
+        }
+      }
+    });
+  }
 }
 
 const GRAPH_HISTORY_MONTHS = 60;

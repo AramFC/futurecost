@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "private": true,
   "description": "FutureCost app",
-  "main": "api/market-history.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node api/market-history.js"
+    "start": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.19.2",
+    "node-fetch": "^2.7.0"
   }
 }

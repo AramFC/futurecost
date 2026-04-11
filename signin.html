@@ -136,6 +136,14 @@
       color: var(--muted);
       font-size: 0.9rem;
     }
+
+    .auth-status.error {
+      color: #f0a3a3;
+    }
+
+    .auth-status.success {
+      color: #b9d8b4;
+    }
   </style>
 </head>
 <body>
@@ -149,12 +157,12 @@
   <main class="auth-page">
     <section class="auth-page-card">
       <div class="auth-page-top">
-        <a href="/" class="auth-page-brand" aria-label="Go to FutureCost home">
+        <a href="./index.html" class="auth-page-brand" aria-label="Go to FutureCost home">
           <span class="brand-kicker">FC</span>
           <span class="brand-name">FutureCost</span>
         </a>
 
-        <a class="auth-page-back" href="/">Back to site</a>
+        <a class="auth-page-back" href="./index.html">Back to site</a>
       </div>
 
       <h1>Sign in</h1>
@@ -185,7 +193,7 @@
 
       <p class="auth-page-note">
         Don’t have an account?
-        <a href="/">Create one from the Get Started button</a>
+        <a href="./index.html">Create one from the Get Started button</a>
       </p>
     </section>
   </main>
@@ -193,24 +201,63 @@
   <script>
     const signinForm = document.getElementById("signinForm");
     const signinStatus = document.getElementById("signinStatus");
+    const signinSubmitBtn = signinForm?.querySelector('button[type="submit"]');
 
     signinForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
       const email = document.getElementById("signinEmail")?.value.trim();
-      const password = document.getElementById("signinPassword")?.value;
+      const password = document.getElementById("signinPassword")?.value || "";
+
+      signinStatus.textContent = "";
+      signinStatus.classList.remove("error", "success");
 
       if (!email || !password) {
         signinStatus.textContent = "Please enter your email and password.";
+        signinStatus.classList.add("error");
         return;
       }
 
+      if (signinSubmitBtn) {
+        signinSubmitBtn.disabled = true;
+        signinSubmitBtn.textContent = "Signing In...";
+      }
+
       try {
-        console.log("Sign in attempt:", { email });
-        signinStatus.textContent = "Sign-in UI works. Connect your real auth provider next.";
+        const response = await fetch("/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({
+            email,
+            password
+          })
+        });
+
+        const payload = await response.json();
+
+        if (!response.ok || !payload?.ok) {
+          throw new Error(payload?.message || "Sign in failed.");
+        }
+
+        signinStatus.textContent = "Signed in successfully. Redirecting...";
+        signinStatus.classList.add("success");
+
+        setTimeout(() => {
+          window.location.href = "./index.html";
+        }, 700);
       } catch (error) {
         console.error("Sign in failed:", error);
-        signinStatus.textContent = "Something went wrong while signing in.";
+        signinStatus.textContent = error.message || "Something went wrong while signing in.";
+        signinStatus.classList.add("error");
+      } finally {
+        if (signinSubmitBtn) {
+          signinSubmitBtn.disabled = false;
+          signinSubmitBtn.textContent = "Sign In";
+        }
       }
     });
   </script>
